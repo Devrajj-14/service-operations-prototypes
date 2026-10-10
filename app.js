@@ -77,3 +77,40 @@ if (document.body.dataset.demo === 'magichelpers') {
     show('g-result','g-empty');
   });
 }
+
+if (document.body.dataset.demo === 'iwfm') {
+  $('iwfm-form').addEventListener('submit', event => {
+    event.preventDefault(); if (!event.currentTarget.reportValidity()) return;
+    const checks = [...document.querySelectorAll('input[name=icheck]')];
+    const completed = checks.filter(check => check.checked).map(check => check.value);
+    const pending = checks.filter(check => !check.checked).map(check => check.value);
+    const issue = value('i-issue');
+    $('i-score').textContent = `${completed.length}/${checks.length}`;
+    status('i-status', issue || pending.length ? 'Open items need review' : 'All checks complete', Boolean(issue || pending.length));
+    $('i-summary').textContent = `IWFM SITE QUALITY CHECK\nSite: ${value('i-site')}\nCity: ${value('i-city')}\nShift: ${value('i-shift')}\nDate: ${new Date().toLocaleDateString('en-GB')}\nCompleted: ${completed.join('; ') || 'None'}\nPending: ${pending.join('; ') || 'None'}\nIssue: ${issue || 'None recorded'}\nSuggested next step: ${issue || pending.length ? 'Supervisor to assign and confirm open items.' : 'Confirm the site report with the client.'}`;
+    show('i-result','i-empty');
+  });
+}
+
+if (document.body.dataset.demo === 'turnoverspecialists') {
+  $('ts-form').addEventListener('submit', event => {
+    event.preventDefault(); if (!event.currentTarget.reportValidity()) return;
+    const tasks = value('ts-tasks').split('\n').map(task => task.trim()).filter(Boolean).slice(0, 12);
+    if (!tasks.length) { $('ts-tasks').setCustomValidity('Add at least one task.'); $('ts-tasks').reportValidity(); $('ts-tasks').setCustomValidity(''); return; }
+    const list = $('ts-checklist'); list.replaceChildren();
+    tasks.forEach((task, index) => {
+      const label = document.createElement('label'); label.className = 'check';
+      const input = document.createElement('input'); input.type = 'checkbox'; input.value = task; input.id = `ts-task-${index}`;
+      input.addEventListener('change', render);
+      label.append(input, document.createTextNode(task)); list.append(label);
+    });
+    show('ts-result','ts-empty'); render();
+  });
+  function render() {
+    const all = [...$('ts-checklist').querySelectorAll('input')];
+    const done = all.filter(item => item.checked).map(item => item.value);
+    const open = all.filter(item => !item.checked).map(item => item.value);
+    status('ts-status', open.length ? `${open.length} tasks still open` : 'All tasks complete · ready for review', Boolean(open.length));
+    $('ts-summary').textContent = `TURNOVER CHECKLIST\nProperty: ${value('ts-property')}\nDate: ${value('ts-window')}\nCompleted (${done.length}): ${done.join('; ') || 'None'}\nOpen (${open.length}): ${open.join('; ') || 'None'}\nNext step: ${open.length ? 'Complete or hand off remaining tasks.' : 'Confirm property is guest-ready.'}`;
+  }
+}
