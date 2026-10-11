@@ -114,3 +114,13 @@ if (document.body.dataset.demo === 'turnoverspecialists') {
     $('ts-summary').textContent = `TURNOVER CHECKLIST\nProperty: ${value('ts-property')}\nDate: ${value('ts-window')}\nCompleted (${done.length}): ${done.join('; ') || 'None'}\nOpen (${open.length}): ${open.join('; ') || 'None'}\nNext step: ${open.length ? 'Complete or hand off remaining tasks.' : 'Confirm property is guest-ready.'}`;
   }
 }
+
+if (document.body.dataset.demo === 'pristine') {
+  $('p-form').addEventListener('submit', event => {
+    event.preventDefault(); if (!event.currentTarget.reportValidity()) return;
+    const oneTime = value('p-frequency') === 'One-time';
+    status('p-status', 'Ready for site and pricing review', false);
+    $('p-summary').textContent = `FACILITY SERVICE ENQUIRY\nSite: ${value('p-site')}\nLocation: ${value('p-city')}\nSite type: ${value('p-type')}\nService: ${value('p-service')}\nApproximate area: ${Number(value('p-size')).toLocaleString('en-IN')} sq ft\nFrequency: ${value('p-frequency')}\nConstraints: ${value('p-notes') || 'None stated'}\nQuestions before estimating: ${oneTime ? 'Confirm site condition, access, preferred date and exact scope.' : 'Confirm service hours, staffing, supplies and contract term.'}`;
+    show('p-result','p-empty');
+  });
+}
